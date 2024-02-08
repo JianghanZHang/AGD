@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "cholesky": "cpp",
+        "*.ipp": "cpp",
+        "vector": "cpp"
+    }
+}
