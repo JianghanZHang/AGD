@@ -15,18 +15,16 @@ namespace bp = boost::python;
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(SolverGRG_solves, SolverGRG::solve, 0, 5)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(SolverGRG_computeDirections, SolverGRG::computeDirection, 0, 1)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(SolverGRG_trySteps, SolverGRG::tryStep, 0, 1)
+
 
 void exposeSolverGRG() {
   bp::register_ptr_to_python<boost::shared_ptr<SolverGRG> >();
 
   bp::class_<SolverGRG, bp::bases<crocoddyl::SolverAbstract> >(
-      "SolverSQP",
+      "SolverGRG",
       "SQP solver.\n\n"
-      "The SQP solver computes an optimal trajectory and control commands by iterates\n"
-      "running backward and forward passes. The backward-pass updates locally the\n"
-      "quadratic approximation of the problem and computes descent direction,\n"
-      "and the forward-pass rollouts this new policy by integrating the system dynamics\n"
-      "along a tuple of optimized control commands U*.\n"
+      "The GRG solver.\n"
       ":param shootingProblem: shooting problem (list of action models along trajectory.)",
       bp::init<boost::shared_ptr<crocoddyl::ShootingProblem> >(bp::args("self", "problem"),
                                                     "Initialize the vector dimension.\n\n"
@@ -53,13 +51,14 @@ void exposeSolverGRG() {
       .add_property("KKT", bp::make_function(&SolverGRG::get_KKT),
                     "KKT residual norm")
 
-      .add_property("gap_norm", bp::make_function(&SolverGRG::get_gap_norm), 'gap_norm')
+      .add_property("gap_norm", bp::make_function(&SolverGRG::get_gap_norm),
+                     "gap norm")
 
       .add_property("x_grad_norm", bp::make_function(&SolverGRG::get_xgrad_norm), "x_grad_norm")
 
       .add_property("u_grad_norm", bp::make_function(&SolverGRG::get_ugrad_norm), "u_grad_norm")
 
-      .add_property("const_step_length", bp::make_function(&SolverGRG::get_const_step_length), bp::make_function(&SolverGRG::set_const_step_length),
+      .add_property("const_step_length", bp::make_function(&SolverGRG::getConstStepLength), bp::make_function(&SolverGRG::setConstStepLength),
                     "Constant step length (default: 1.)")
 
       .add_property("use_line_search", bp::make_function(&SolverGRG::get_use_line_search), bp::make_function(&SolverGRG::set_use_line_search),
@@ -82,7 +81,8 @@ void exposeSolverGRG() {
                     "Activates the callbacks when true (default: False)")
     
       .add_property("mu", bp::make_function(&SolverGRG::get_mu), bp::make_function(&SolverGRG::set_mu),
-                    "Penalty term for dynamic violation in the merit function (default: 1.)")
+                    "Penalty term for dynamic violation in the merit function (default: 0.)")
+
       .add_property("termination_tolerance", bp::make_function(&SolverGRG::get_termination_tolerance), bp::make_function(&SolverGRG::set_termination_tolerance),
                     "Termination criteria to exit the iteration (default: 1e-6)");
      

@@ -15,4 +15,5 @@ BOOST_PYTHON_MODULE(grg_pywrap) {
     bp::import("crocoddyl");
 
     grg::exposeSolverGRG();
+    grg::exposeSolverGRG_ADAHESSIAN();
 }

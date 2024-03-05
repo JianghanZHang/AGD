@@ -5,6 +5,7 @@ endif(GENERATE_PYTHON_STUBS)
 set(${PY_NAME}_SOURCES
   main.cpp
   grg.cpp
+  grg_adahessian.cpp
   )
 
 
@@ -21,9 +22,9 @@ if(GENERATE_PYTHON_STUBS)
   generate_stubs(${CMAKE_CURRENT_BINARY_DIR} ${PY_NAME}_pywrap ${PYTHON_SITELIB} ${PY_NAME}_pywrap)
 endif(GENERATE_PYTHON_STUBS)
 
-set(${PY_NAME}_PYTHON mim_solvers/__init__.py)
+set(${PY_NAME}_PYTHON grg/__init__.py)
 
-SET(PYLIB_INSTALL_DIR ${PYTHON_SITELIB}/mim_solvers)
+SET(PYLIB_INSTALL_DIR ${PYTHON_SITELIB}/grg)
 IF(UNIX)
   GET_RELATIVE_RPATH(${PYLIB_INSTALL_DIR} PYLIB_RPATH)
   SET_TARGET_PROPERTIES(${PY_NAME}_pywrap PROPERTIES INSTALL_RPATH ${PYLIB_RPATH})

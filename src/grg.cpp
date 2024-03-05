@@ -6,16 +6,11 @@
 // All rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef CROCODDYL_WITH_MULTITHREADING
-#include <omp.h>
-#endif  // CROCODDYL_WITH_MULTITHREADING
-
 #include <iostream>
 #include <iomanip>
 
 #include <crocoddyl/core/utils/exception.hpp>
 #include "grg/grg.hpp"
-#include "grg.hpp"
 
 using namespace crocoddyl;
 
@@ -23,52 +18,94 @@ namespace grg {
 
 SolverGRG::SolverGRG(boost::shared_ptr<crocoddyl::ShootingProblem> problem)
     : SolverAbstract(problem){
-      
-      const std::size_t T = this->problem_->get_T();
+
+      if (!problem_) {
+        std::cerr << "SolverGRG constructor received a nullptr for problem." << std::endl;
+        throw std::invalid_argument("SolverGRG constructor requires a non-null problem");
+        }
+        
+      #ifdef CROCODDYL_WITH_MULTITHREADING
+      std::cout << "Built with multithreading" << std::endl;
+      #endif  // CROCODDYL_WITH_MULTITHREADING
+
+      const std::size_t T = problem_->get_T();
       const std::size_t ndx = problem_->get_ndx();
+      xs_try_.resize(T + 1);
+      us_try_.resize(T);
       fs_try_.resize(T + 1);
       dx_.resize(T+1);
       du_.resize(T);
+      Vx_.resize(T + 1);
+      Vu_.resize(T);
       Vu_square_.resize(T);
+      m_corrected_.resize(T);
+      v_corrected_.resize(T);
       m_.resize(T);
       v_.resize(T);
+      fs_flat_.resize(ndx*(T + 1));
+      fs_flat_.setZero();
       gap_list_.resize(filter_size_);
       cost_list_.resize(filter_size_);
+      tmpxs_.resize(T + 1);
       const std::vector<boost::shared_ptr<crocoddyl::ActionModelAbstract> >& models = problem_->get_runningModels();
       for (std::size_t t = 0; t < T; ++t) {
         const boost::shared_ptr<crocoddyl::ActionModelAbstract>& model = models[t];
         const std::size_t nu = model->get_nu();
-        dx_[t].resize(ndx); du_[t].resize(nu);
-        fs_try_[t].resize(ndx);
-        dx_[t].setZero();
-        du_[t] = Eigen::VectorXd::Zero(nu);
-        fs_try_[t] = Eigen::VectorXd::Zero(ndx);
-        tmp_vec_u_[t].resize(nu);
-      }
-      dx_.back().resize(ndx);
-      dx_.back().setZero();
-      fs_try_.back().resize(ndx);
-      fs_try_.back() = Eigen::VectorXd::Zero(ndx);
 
-      const std::size_t n_alphas = 10;
+        Vx_[t] = Eigen::VectorXd::Zero(ndx);
+        Vu_[t] = Eigen::VectorXd::Zero(nu);
+        m_corrected_[t] = Eigen::VectorXd::Zero(nu);
+        v_corrected_[t] = Eigen::VectorXd::Zero(nu);
+        m_[t] = Eigen::VectorXd::Zero(nu);
+        v_[t] = Eigen::VectorXd::Zero(nu);
+
+        if (t == 0) {
+            xs_try_[t] = problem_->get_x0();
+        } 
+        else {
+            xs_try_[t] = model->get_state()->zero();
+        }
+        us_try_[t] = Eigen::VectorXd::Zero(nu);
+        dx_[t] = Eigen::VectorXd::Zero(ndx);
+        du_[t] = Eigen::VectorXd::Zero(nu);
+
+        fs_try_[t] = Eigen::VectorXd::Zero(ndx);
+        du_[t] = Eigen::VectorXd::Zero(nu);
+        tmpxs_[t] = Eigen::VectorXd::Zero(ndx);
+      }
+      dx_.back() = Eigen::VectorXd::Zero(ndx);
+
+      fs_try_.back() = Eigen::VectorXd::Zero(ndx);
+      xs_try_.back() = problem_->get_terminalModel()->get_state()->zero();
+      Vx_.back() = Eigen::VectorXd::Zero(ndx);
+      
+      const std::size_t n_alphas = 5;
       alphas_.resize(n_alphas);
       for (std::size_t n = 0; n < n_alphas; ++n) {
-        alphas_[n] = 1. / pow(2., static_cast<double>(n));
+        alphas_[n] = 2. / pow(2., static_cast<double>(n));
       }
     }
 
 SolverGRG::~SolverGRG() {}
 
 bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::vector<Eigen::VectorXd>& init_us,
-                       const std::size_t maxiter, const bool is_feasible) {
-
+                       const std::size_t maxiter, const bool is_feasible, const double reginit) {
+  const std::size_t T = problem_->get_T();
+  // for (std::size_t t = 0; t < T; ++t) {
+  //   m_[t].setZero();
+  //   v_[t].setZero(); 
+  // }
   START_PROFILER("SolverGRG::solve");
   (void)is_feasible;
   
   if (problem_->is_updated()) {
     resizeData();
   }
-  setCandidate(init_xs, init_us, false);
+  fail_time_tmp_ = 0;
+  tmpxs_ = problem_->rollout_us(init_us);
+  setCandidate(tmpxs_, init_us, false);
+  // setCandidate(init_xs, init_us, false);
+
   xs_[0] = problem_->get_x0();      // Otherwise xs[0] is overwritten by init_xs inside setCandidate()
   xs_try_[0] = problem_->get_x0();  // it is needed in case that init_xs[0] is infeasible
 
@@ -79,7 +116,7 @@ bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::ve
 
     while (true) {
       try {
-        computeDirection(recalcDiff, iter_);
+        computeDirection(recalcDiff);
       } 
       catch (std::exception& e) {
         return false;
@@ -88,7 +125,8 @@ bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::ve
     }
 
     // KKT termination criteria
-    checkKKTConditions();
+    checkKTConditions();
+    
     if (KKT_ <= termination_tol_) {
       if(with_callbacks_){
         printCallbacks();
@@ -100,85 +138,82 @@ bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::ve
     gap_list_.push_back(gap_norm_);
     cost_list_.push_back(cost_);
 
-    if(ust_line_search_){
+    if(use_line_search_){
         // We need to recalculate the derivatives when the step length passes
+        tmp_ub_ = c_ * curvature_;
+        tmp_lb_ = (1-c_) * curvature_;
         for (std::vector<double>::const_iterator it = alphas_.begin(); it != alphas_.end(); ++it) {
         steplength_ = *it;
         try {
-            merit_try_ = tryStep(steplength_);
+            tryStep(steplength_);
+            ub_ = merit_+ steplength_ * tmp_ub_;
+            lb_ = merit_ + steplength_ * tmp_lb_;
         } catch (std::exception& e) {
             continue;
         }
-        // Filter line search criteria 
-        // Equivalent to heuristic cost_ > cost_try_ || gap_norm_ > gap_norm_try_ when filter_size=1
-        if(use_filter_line_search_){
-            is_worse_than_memory_ = false;
-            std::size_t count = 0.; 
-            while( count < filter_size_ && is_worse_than_memory_ == false and count <= iter_){
-            is_worse_than_memory_ = cost_list_[filter_size_-1-count] <= cost_try_ && gap_list_[filter_size_-1-count] <= gap_norm_try_;
-            count++;
-            }
-            if( is_worse_than_memory_ == false ) {
+        
+        // Goldenstein line search criteria
+        if ((merit_try_ <= ub_ && merit_try_ >= lb_) || steplength_ == alphas_.back()) {
+        // if ((merit_try_ <= ub_) || steplength_ == alphas_.back()) {
             setCandidate(xs_try_, us_try_, false);
             recalcDiff = true;
-            break;
-            } 
-        }
-        // Line-search criteria using merit function
-        else{
-            if (merit_ > merit_try_) {
-            setCandidate(xs_try_, us_try_, false);
-            recalcDiff = true;
-            break;
+            if(steplength_ == alphas_.back()){
+              fail_time_tmp_ ++;
             }
+            break;
         }
+        // filter line search criteria
+        // if ((merit_try_ <= merit_ ) || (steplength_ == alphas_.back())){
+        //     setCandidate(xs_try_, us_try_, false);
+        //     recalcDiff = true;
+        //     if(steplength_ == alphas_.back()){
+        //       fail_time_tmp_ ++;
+        //     }
+        //     break;
+        // }
         }
     }
     else{
-        merit_try_ = tryStep(const_step_length_);
+        steplength_ = const_step_length_;
+        tryStep(steplength_);
         setCandidate(xs_try_, us_try_, false);
         recalcDiff = true;
     }
-
-    // if (steplength_ > th_stepdec_) {
-    //   decreaseRegularization();
-    // }
-    // if (steplength_ <= th_stepinc_) {
-    //   increaseRegularization();
-    //   if (preg_ == reg_max_) {
-    //     STOP_PROFILER("SolverGRG::solve");
-    //     return false;
-    //   }
-    // }
-
     if(with_callbacks_){
       printCallbacks();
     }
   }
+  STOP_PROFILER("SolverGRG::solve");
+
+  return false;
 
 }
 
-void SolverGRG::computeDirection(const bool recalcDiff, std::size_t iter_){
+void SolverGRG::computeDirection(const bool recalcDiff){
   START_PROFILER("SolverGRG::computeDirection");
   if (recalcDiff) {
-    cost_ = calcDiff();
+      calcDiff();
   }
   gap_norm_ = 0;
   const std::size_t T = problem_->get_T();
+
+  #ifdef CROCODDYL_WITH_MULTITHREADING
+  #pragma omp simd reduction(+:gap_norm_)
+  #endif
   for (std::size_t t = 0; t < T; ++t) {
     gap_norm_ += fs_[t].lpNorm<1>();   
   }
   gap_norm_ += fs_.back().lpNorm<1>();   
 
-  merit_ = cost_ + mu_*gap_norm_;
+  merit_ = cost_ + mu_ * gap_norm_;
 
   backwardPass();
-  forwardPass(iter_);
+  forwardPass();
 
   STOP_PROFILER("SolverGRG::computeDirection");
 }
 
-void SolverGRG::checkKKTConditions(){
+void SolverGRG::checkKTConditions(){
   KKT_ = 0.;
   const std::size_t T = problem_->get_T();
   const std::size_t ndx = problem_->get_ndx();
@@ -196,6 +231,53 @@ void SolverGRG::checkKKTConditions(){
   KKT_ = std::max(KKT_, fs_flat_.lpNorm<Eigen::Infinity>());
 }
 
+double SolverGRG::stoppingCriteria() {
+  stop_ = 0.;
+  const std::size_t T = this->problem_->get_T();
+  const std::vector<boost::shared_ptr<ActionModelAbstract> >& models = problem_->get_runningModels();
+
+  for (std::size_t t = 0; t < T; ++t) {
+    const std::size_t nu = models[t]->get_nu();
+    if (nu != 0) {
+      stop_ += Vu_[t].squaredNorm();
+    }
+  }
+  return stop_;
+}
+
+const Eigen::Vector2d& SolverGRG::expectedImprovement() {
+  d_.fill(0.0);
+//   const std::size_t T = this->problem_->get_T();
+//   const std::vector<boost::shared_ptr<ActionModelAbstract> >& models = problem_->get_runningModels();
+//   for (std::size_t t = 0; t < T; ++t) {
+//     const std::size_t nu = models[t]->get_nu();
+//     if (nu != 0) {
+//       d_[0] += Qu_[t].dot(k_[t]);
+//       d_[1] -= k_[t].dot(Quuk_[t]);
+//     }
+//   }
+  return d_;
+}
+
+void SolverGRG::resizeData() {
+  START_PROFILER("SolverGRG::resizeData");
+  SolverAbstract::resizeData();
+
+  const std::size_t T = problem_->get_T();
+  const std::size_t ndx = problem_->get_ndx();
+  const std::vector<boost::shared_ptr<ActionModelAbstract> >& models = problem_->get_runningModels();
+  for (std::size_t t = 0; t < T; ++t) {
+    const boost::shared_ptr<ActionModelAbstract>& model = models[t];
+    const std::size_t nu = model->get_nu();
+
+    Vx_[t].conservativeResize(ndx);
+    Vu_[t].conservativeResize(nu);
+
+    m_[t].conservativeResize(nu);
+    v_[t].conservativeResize(nu);
+  }
+  STOP_PROFILER("SolverGRG::resizeData");
+}
 
 double SolverGRG::calcDiff() {
   START_PROFILER("SolverGRG::calcDiff");
@@ -242,53 +324,69 @@ void SolverGRG::backwardPass() {
 }
 
 
-void SolverGRG::forwardPass(std::size_t iter_){
+void SolverGRG::forwardPass(){
     START_PROFILER("SolverGRG::forwardPass");
     x_grad_norm_ = 0; 
     u_grad_norm_ = 0;
+    curvature_ = 0;
 
     const std::size_t T = problem_->get_T();
     const std::vector<boost::shared_ptr<ActionDataAbstract> >& datas = problem_->get_runningDatas();
 
     if(correct_bias_){
-    
+        #ifdef CROCODDYL_WITH_MULTITHREADING
+        #pragma omp parallel for num_threads(problem_->get_nthreads())
+        #endif
         for (std::size_t t = 0; t < T; ++t) {
         const boost::shared_ptr<ActionDataAbstract>& d = datas[t];
         Vu_square_[t] = Vu_[t].cwiseProduct(Vu_[t]);
-        m_[t] = (1 - beta1_) * Vu_[t] + beta1_ * m_[t];
-        v_[t] = (1 - beta2_) * Vu_square_[t] + beta2_ * v_[t];
+        m_[t] = beta1_ * m_[t] + (1 - beta1_) * Vu_[t];
+        v_[t] = beta2_ * v_[t] + (1 - beta2_) * Vu_square_[t];
+        // v_[t] = v_[t].cwiseMax(beta2_ * v_[t] + (1 - beta2_) * Vu_square_[t]);
 
         m_corrected_[t] = m_[t] / (1 - pow(beta1_, iter_+2));
         v_corrected_[t] = v_[t] / (1 - pow(beta2_, iter_+2));
 
-        du_[t].noalias() = - m_corrected_[t].cwiseQuotient(v_corrected_[t].cwiseSqrt());
-
-        dx_[t+1].noalias() = fs_[t+1];
+        du_[t] = - m_corrected_[t].cwiseQuotient(v_corrected_[t].cwiseSqrt());
+        // du_[t].noalias() = - Vu_[t]; //vanilla gradient descent
+        // du_[t].noalias() = - Vu_[t];
+        u_grad_norm_ += du_[t].lpNorm<1>();
+        curvature_ += du_[t].dot(Vu_[t]);
+        }
+        
+        for (std::size_t t = 0; t < T; ++t) {
+        const boost::shared_ptr<ActionDataAbstract>& d = datas[t];
+        // std::cout << "dx_"<< dx_[t+1].transpose() << std::endl;
+        // std::cout << "fs_"<<fs_[t+1].transpose() << std::endl;
+        dx_[t+1] = fs_[t+1];
         dx_[t+1].noalias() += d->Fu * du_[t];
         dx_[t+1].noalias() += d->Fx * dx_[t];
         x_grad_norm_ += dx_[t].lpNorm<1>(); // assuming that there is no gap in the initial state
-        u_grad_norm_ += du_[t].lpNorm<1>();
         }
-
     }
 
     else{
 
+        #ifdef CROCODDYL_WITH_MULTITHREADING
+        #pragma omp parallel for num_threads(problem_->get_nthreads())
+        #endif
         for (std::size_t t = 0; t < T; ++t) {
         const boost::shared_ptr<ActionDataAbstract>& d = datas[t];
         Vu_square_[t] = Vu_[t].cwiseProduct(Vu_[t]);
         m_[t] = (1 - beta1_) * Vu_[t] + beta1_ * m_[t];
         v_[t] = (1 - beta2_) * Vu_square_[t] + beta2_ * v_[t];
-
-        du_[t].noalias() = -m_[t].cwiseQuotient(v_[t].cwiseSqrt());
-
-        dx_[t+1].noalias() = fs_[t+1];
+        
+        du_[t] = -m_[t].cwiseQuotient(v_[t].cwiseSqrt());
+        u_grad_norm_ += du_[t].lpNorm<1>();
+        }
+        
+        for (std::size_t t = 0; t < T; ++t) {
+        const boost::shared_ptr<ActionDataAbstract>& d = datas[t];
+        dx_[t+1] = fs_[t+1];
         dx_[t+1].noalias() += d->Fu * du_[t];
         dx_[t+1].noalias() += d->Fx * dx_[t];
         x_grad_norm_ += dx_[t].lpNorm<1>(); // assuming that there is no gap in the initial state
-        u_grad_norm_ += du_[t].lpNorm<1>();
         }
-
     }
 
     x_grad_norm_ += dx_.back().lpNorm<1>(); // assuming that there is no gap in the initial state
@@ -299,7 +397,11 @@ void SolverGRG::forwardPass(std::size_t iter_){
 }
 
 double SolverGRG::tryStep(const double steplength) {
-    if (steplength > 1. || steplength < 0.) {
+    // if (steplength > 1. || steplength < 0.) {
+    //     throw_pretty("Invalid argument: "
+    //                 << "invalid step length, value is between 0. to 1.");
+    // }
+    if (steplength < 0.) {
         throw_pretty("Invalid argument: "
                     << "invalid step length, value is between 0. to 1.");
     }
@@ -312,6 +414,9 @@ double SolverGRG::tryStep(const double steplength) {
     const std::vector<boost::shared_ptr<ActionModelAbstract> >& models = problem_->get_runningModels();
     const std::vector<boost::shared_ptr<ActionDataAbstract> >& datas = problem_->get_runningDatas();
 
+    #ifdef CROCODDYL_WITH_MULTITHREADING
+    #pragma omp parallel for num_threads(problem_->get_nthreads())
+    #endif
     for (std::size_t t = 0; t < T; ++t) {
         const boost::shared_ptr<ActionModelAbstract>& m = models[t];
         const boost::shared_ptr<ActionDataAbstract>& d = datas[t];
@@ -319,22 +424,35 @@ double SolverGRG::tryStep(const double steplength) {
 
         m->get_state()->integrate(xs_[t], steplength * dx_[t], xs_try_[t]); 
         if (nu != 0) {
-            us_try_[t].noalias() = us_[t];
+            us_try_[t] = us_[t];
             us_try_[t].noalias() += steplength * du_[t];
-        }        
+        }      
         m->calc(d, xs_try_[t], us_try_[t]);        
-        cost_try_ += d->cost;
-
-        if (t > 0){
-          const boost::shared_ptr<ActionDataAbstract>& d_prev = datas[t-1];
-          m->get_state()->diff(xs_try_[t], d_prev->xnext, fs_try_[t-1]);
-          gap_norm_try_ += fs_try_[t-1].lpNorm<1>(); 
-        } 
 
         if (raiseIfNaN(cost_try_)) {
           STOP_PROFILER("SolverGRG::tryStep");
           throw_pretty("step_error");
         }   
+
+        if (t > 0){
+          const boost::shared_ptr<ActionDataAbstract>& d_prev = datas[t-1];
+          m->get_state()->diff(xs_try_[t], d_prev->xnext, fs_try_[t-1]);
+          gap_norm_try_ += fs_try_[t].lpNorm<1>(); 
+        } 
+    }
+
+    #ifdef CROCODDYL_WITH_MULTITHREADING
+    #pragma omp simd reduction(+:gap_norm_try_, cost_try_)
+    #endif
+    for (std::size_t t = 0; t < T; ++t) {
+        const boost::shared_ptr<ActionModelAbstract>& m = models[t];
+        const boost::shared_ptr<ActionDataAbstract>& d = datas[t];
+        cost_try_ += d->cost;
+        if (t > 0){
+          const boost::shared_ptr<ActionDataAbstract>& d_prev = datas[t-1];
+          m->get_state()->diff(xs_try_[t], d_prev->xnext, fs_try_[t]);
+          gap_norm_try_ += fs_try_[t].lpNorm<1>(); 
+        } 
     }
 
     // Terminal state update
@@ -347,10 +465,10 @@ double SolverGRG::tryStep(const double steplength) {
     const boost::shared_ptr<crocoddyl::ActionModelAbstract>& m = models[T-1];
     const boost::shared_ptr<crocoddyl::ActionDataAbstract>& d = datas[T-1];
     
-    m->get_state()->diff(xs_try_.back(), d->xnext, fs_try_[T-1]);
-    gap_norm_try_ += fs_try_[T-1].lpNorm<1>(); 
+    m->get_state()->diff(xs_try_.back(), d->xnext, fs_try_.back());
+    gap_norm_try_ += fs_try_.back().lpNorm<1>(); 
 
-    merit_try_ = cost_try_ + mu_*gap_norm_try_;
+    merit_try_ = cost_try_ + mu_ * gap_norm_try_;
 
     if (raiseIfNaN(cost_try_)) {
         STOP_PROFILER("SolverGRG::tryStep");
@@ -364,13 +482,13 @@ double SolverGRG::tryStep(const double steplength) {
 
 void SolverGRG::printCallbacks(){
   if (this->get_iter() % 10 == 0) {
-    std::cout << "iter     merit         cost         grad      step    ||gaps||        KKT";
+    std::cout << "iter     merit         cost         grad      step    ||gaps||        KKT        merit_try        cost_try";
     std::cout << std::endl;
   }
   if(KKT_ < termination_tol_){
     std::cout << std::setw(4) << "END" << "  ";
   } else {
-    std::cout << std::setw(4) << this->get_iter()+1 << "  ";
+    std::cout << std::setw(4) << this->get_iter() << "  ";
   }
   std::cout << std::scientific << std::setprecision(5) << this->get_merit() << "  ";
   std::cout << std::scientific << std::setprecision(5) << this->get_cost() << "  ";
@@ -381,7 +499,11 @@ void SolverGRG::printCallbacks(){
     std::cout << std::fixed << std::setprecision(4) << this->get_steplength() << "  ";
   }
   std::cout << std::scientific << std::setprecision(5) << this->get_gap_norm() << "  ";
-  std::cout << std::scientific << std::setprecision(5) << KKT_;
+  std::cout << std::scientific << std::setprecision(5) << KKT_ << "  ";
+  std::cout << std::scientific << std::setprecision(5) << merit_try_ << "  ";
+  std::cout << std::scientific << std::setprecision(5) << cost_try_ << "  ";
+  std::cout << std::endl;
+  // std::cout << "line search fail time: " << fail_time_tmp_;
   std::cout << std::endl;
   std::cout << std::flush;
 }

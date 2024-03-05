@@ -1,11 +1,9 @@
-#ifndef __mim_solvers_python__
-#define __mim_solvers_python__
-
 #include <boost/python.hpp>
 
 #include "grg/grg.hpp"
+#include "grg/grg_adahessian.hpp"
 
-
-namespace mim_solvers{
+namespace grg{
     void exposeSolverGRG();
+    void exposeSolverGRG_ADAHESSIAN();
 } // namespace mim_solvers
