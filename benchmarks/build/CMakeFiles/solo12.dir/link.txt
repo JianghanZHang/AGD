@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/solo12.dir/solo12.o  -o solo12   -L/home/jianghan/Devel/workspace/src/mim_solvers/benchmarks/build  -Wl,-rpath,/home/jianghan/Devel/workspace/src/mim_solvers/benchmarks/build -lProject -lexample-robot-data::example-robot-data libProject_BENCHMARK_TOOLS.so 
