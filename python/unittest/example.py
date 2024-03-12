@@ -122,8 +122,8 @@ def humanoid_taichi_problem(T):
     actuation = crocoddyl.ActuationModelFloatingBase(state)
 
     # Set integration time
-    DT = 5e-2
-    T = 40
+    DT = 1e-3
+    T = 20
     target = np.array([0.4, 0, 1.2])
 
     # Initialize reference state, target and reference CoM
@@ -334,7 +334,7 @@ def quadrotor_problem(T):
     runningCostModel.addCost("trackPose", goalTrackingCost, 1e-2)
     terminalCostModel.addCost("goalPose", goalTrackingCost, 3.0)
 
-    dt = 3e-2
+    dt = 1e-2
     runningModel = crocoddyl.IntegratedActionModelEuler(
         crocoddyl.DifferentialActionModelFreeFwdDynamics(
             state, actuation, runningCostModel

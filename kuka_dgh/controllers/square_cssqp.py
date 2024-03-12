@@ -7,6 +7,10 @@ import time
 from croco_mpc_utils.ocp_constraints import OptimalControlProblemClassicalWithConstraints
 import croco_mpc_utils.pinocchio_utils as pin_utils
 
+import sys
+sys.path.append('../../python/')
+from SolverALGRG import SolverAlGRG
+
 from croco_mpc_utils.utils import CustomLogger, GLOBAL_LOG_LEVEL, GLOBAL_LOG_FORMAT
 logger = CustomLogger(__name__, GLOBAL_LOG_LEVEL, GLOBAL_LOG_FORMAT).logger
 
@@ -37,10 +41,13 @@ def solveOCP(q, v, solver, max_sqp_iter, max_qp_iter, target_reach, ee_lb, ee_ub
         solver.problem.terminalModel.differential.constraints.constraints['translationBox'].constraint.updateBounds(ee_lb, ee_ub)
         
     solver.max_qp_iters = max_qp_iter
-    solver.solve(xs_init, us_init, maxiter=max_sqp_iter, isFeasible=False)
+    solver.solve(xs_init, us_init, maxIter=max_sqp_iter, isFeasible=False)
     solve_time = time.time()
+
+    solver.qp_iters = 1
+    solver.KKT = np.inf
     
-    return  solver.us[0], solver.xs[1], solver.K[0], solve_time - t, solver.iter, solver.cost, solver.constraint_norm, solver.gap_norm, solver.qp_iters, solver.KKT
+    return  solver.us[0], solver.xs[1], None, solve_time - t, solver.iter, solver.cost, solver.constraint_norm, solver.gap_norm, solver.qp_iters, solver.KKT
 
 
 
@@ -99,6 +106,11 @@ class KukaSquareCSSQP:
         elif(config['SOLVER'] == 'cssqp'):
             logger.warning("Using the CSSQP solver.")            
             self.solver = mim_solvers.SolverCSQP(problem)
+
+        elif(config['SOLVER'] == 'algrg'):
+            logger.warning("Using the ALGRG solver.")            
+            self.solver = SolverAlGRG(problem)
+            self.solver.refresh = True
             
         self.solver.with_callbacks         = self.config['with_callbacks']
         self.solver.use_filter_line_search = self.config['use_filter_line_search']
@@ -114,7 +126,7 @@ class KukaSquareCSSQP:
         self.solver.reg_max                = 1e6
 
         # Allocate MPC data
-        self.K = self.solver.K[0]
+        # self.K = self.solver.K[0]
         self.x_des = self.solver.xs[0]
         self.tau_ff = self.solver.us[0]
         self.tau = self.tau_ff.copy() ; self.tau_riccati = np.zeros(self.tau.shape)

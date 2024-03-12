@@ -144,7 +144,7 @@ class SolverGRG_ADAHESSIAN : public crocoddyl::SolverAbstract {
   double beta1_ = 0.9;
   double beta2_ = 0.999;
   bool correct_bias_ = true;
-  bool use_line_search_ = true;
+  bool use_line_search_ = false;
   double const_step_length_ = 0.01;
   double KKT_ = std::numeric_limits<double>::infinity();   //!< KKT conditions residual
   double ub_ = std::numeric_limits<double>::infinity();    //!< Upper bound for Goldenstein line-search

@@ -34,10 +34,10 @@ if(SIM):
     data_path = '/tmp/'
     
     #T = 10 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-05T17:02:19.278784_grg_CODE_SPRINT'
+    # data_name = 'circle_grg_SIM_2024-03-07T14:08:19.232817_grg_CODE_SPRINT'
     # data_name1 = 'circle_grg_SIM_2024-03-01T14:09:07.930336_sqp_CODE_SPRINT'
     # data_name2 = 'circle_grg_SIM_2024-03-01T13:57:35.403756_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-05T17:02:48.793888_grg_h_CODE_SPRINT'
+    # data_name3 = 'circle_grg_SIM_2024-03-07T14:47:12.383938_grg_h_CODE_SPRINT'
 
     #T = 20 @100HZ
     # data_name = 'circle_grg_SIM_2024-03-04T18:16:16.567219_grg_CODE_SPRINT'
@@ -45,8 +45,8 @@ if(SIM):
     # data_name2 = 'circle_grg_SIM_2024-03-01T14:11:48.881412_ddp_CODE_SPRINT'
 
     #T = 30 @100HZ
-    # data_name3 = 'circle_grg_SIM_2024-03-05T16:20:45.916532_grg_h_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T18:17:23.242381_grg_CODE_SPRINT'
+    # data_name3 = 'circle_grg_SIM_2024-03-07T14:23:30.121217_grg_h_CODE_SPRINT'
+    # data_name = 'circle_grg_SIM_2024-03-07T14:13:45.760076_grg_CODE_SPRINT'
     # data_name1 = 'circle_grg_SIM_2024-03-01T14:18:24.556685_sqp_CODE_SPRINT'
     # data_name2 = 'circle_grg_SIM_2024-03-01T14:15:06.186234_ddp_CODE_SPRINT'
 
@@ -56,27 +56,36 @@ if(SIM):
     # data_name2 = 'circle_grg_SIM_2024-03-01T14:23:55.574577_ddp_CODE_SPRINT'
 
     #T = 50 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-04T18:18:29.763694_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-04T18:19:08.448627_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-04T18:20:09.840563_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-05T17:05:42.964743_grg_h_CODE_SPRINT'
+    # data_name = 'circle_grg_SIM_2024-03-07T14:10:59.634363_grg_CODE_SPRINT'
+    # data_name1 = 'circle_grg_SIM_2024-03-07T14:27:17.483247_sqp_CODE_SPRINT'
+    # data_name2 = 'circle_grg_SIM_2024-03-07T14:40:12.459942_ddp_CODE_SPRINT'
+    # data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_h_CODE_SPRINT'
+
+    #T = 100 @100HZ
+    data_name = 'circle_grg_SIM_2024-03-07T18:11:37.435691_grg_CODE_SPRINT'
+    data_name1 = 'circle_grg_SIM_2024-03-07T14:27:17.483247_sqp_CODE_SPRINT'
+    data_name2 = 'circle_grg_SIM_2024-03-07T16:13:59.509181_ddp_CODE_SPRINT'
+    data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_h_CODE_SPRINT'
 
     #T = 20 @1000HZ
-    data_name = 'circle_grg_SIM_2024-03-05T17:14:17.970712_grg_CODE_SPRINT'
-    data_name1 = 'circle_grg_SIM_2024-03-05T17:11:19.106560_sqp_CODE_SPRINT'
-    data_name2 =  'circle_grg_SIM_2024-03-05T17:10:26.681366_ddp_CODE_SPRINT'
-    data_name3 = 'circle_grg_SIM_2024-03-05T17:08:45.175145_grg_h_CODE_SPRINT'
+    # data_name = 'circle_grg_SIM_2024-03-07T14:52:36.351751_grg_CODE_SPRINT'
+    # data_name1 = 'circle_grg_SIM_2024-03-05T17:11:19.106560_sqp_CODE_SPRINT'
+    # data_name2 =  'circle_grg_SIM_2024-03-05T17:10:26.681366_ddp_CODE_SPRINT'
+    # data_name3 = 'circle_grg_SIM_2024-03-05T17:08:45.175145_grg_h_CODE_SPRINT'
+
+    
 
 
 else:
     data_path = 'data/unconstrained/new/'
     data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
-    # data_name = 'circle_ssqp_REAL_2023-10-31T16:45:47.050199_sqp' 
 
 r       = DataReader(data_path+data_name+'.mds')
 r1      = DataReader(data_path+data_name1+'.mds')
 r2      = DataReader(data_path+data_name2+'.mds')
-r3      = DataReader(data_path+data_name3+'.mds')
+r3     = DataReader(data_path+data_name3+'.mds')
+r3.date = None
+# r3      = DataReader(data_path+data_name3+'.mds')
 N       = r.data['absolute_time'].shape[0]
 print("Total number of control cycles = ", N)
 time_lin = np.linspace(0, N/config['ctrl_freq'], N)

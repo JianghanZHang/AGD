@@ -48,8 +48,17 @@ def import_mpc_controller(EXP_NAME):
     is_valid_exp_name(EXP_NAME)
     if(EXP_NAME == 'circle_grg'):     
         from controllers.circle_grg  import KukaCircleSGRG as MPCController
-    elif(EXP_NAME == 'circle_ssqp'):     
-        from controllers.circle_ssqp  import KukaCircleSSQP as MPCController
+    elif(EXP_NAME == 'circle_ssqp'):  
+        from controllers.circle_ssqp  import KukaCircleSSQP  as MPCController
+    elif(EXP_NAME == 'circle_cssqp'): 
+        from controllers.circle_cssqp import KukaCircleCSSQP as MPCController
+    elif(EXP_NAME == 'square_cssqp'): 
+        from controllers.square_cssqp import KukaSquareCSSQP as MPCController
+    elif(EXP_NAME == 'plane_cssqp'):  
+        from controllers.plane_cssqp  import KukaPlaneCSSQP  as MPCController
+    elif(EXP_NAME == 'line_cssqp'):  
+        from controllers.line_cssqp  import KukaLineCSSQP  as MPCController
+    logger.debug("Imported MPC controller for experiment : "+str(EXP_NAME))
     
     logger.debug("Imported MPC controller for experiment : "+str(EXP_NAME))
     return MPCController

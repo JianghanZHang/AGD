@@ -104,8 +104,8 @@ class KukaCircleSGRG:
             self.solver = grg.SolverGRG(problem)
             self.solver.beta1 = 0.8
             self.solver.beta2 = 0.8
-            self.solver.use_line_search = False
-            self.solver.const_step_length = 0.1
+            # self.solver.use_line_search = True
+            self.solver.const_step_length = 0.01
             self.solver.with_callbacks = False
         elif(config['SOLVER'] == 'grg_h'):
             logger.warning("Using the GRG_H solver.")
@@ -114,7 +114,7 @@ class KukaCircleSGRG:
             self.solver.beta2 = 0.8
             # self.solver.mu = 1.0
             self.solver.use_line_search = False
-            self.solver.const_step_length = .1
+            self.solver.const_step_length = .02
             self.solver.with_callbacks = False
             
         elif(config['SOLVER'] == 'sqp'):

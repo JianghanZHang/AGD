@@ -79,7 +79,7 @@ SolverGRG::SolverGRG(boost::shared_ptr<crocoddyl::ShootingProblem> problem)
       xs_try_.back() = problem_->get_terminalModel()->get_state()->zero();
       Vx_.back() = Eigen::VectorXd::Zero(ndx);
       
-      const std::size_t n_alphas = 5;
+      const std::size_t n_alphas = 10;
       alphas_.resize(n_alphas);
       for (std::size_t n = 0; n < n_alphas; ++n) {
         alphas_[n] = 2. / pow(2., static_cast<double>(n));
@@ -153,17 +153,8 @@ bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::ve
         }
         
         // Goldenstein line search criteria
-        if ((merit_try_ <= ub_ && merit_try_ >= lb_) || steplength_ == alphas_.back()) {
-        // if ((merit_try_ <= ub_) || steplength_ == alphas_.back()) {
-            setCandidate(xs_try_, us_try_, false);
-            recalcDiff = true;
-            if(steplength_ == alphas_.back()){
-              fail_time_tmp_ ++;
-            }
-            break;
-        }
-        // filter line search criteria
-        // if ((merit_try_ <= merit_ ) || (steplength_ == alphas_.back())){
+        // if ((merit_try_ <= ub_ && merit_try_ >= lb_) || steplength_ == alphas_.back()) {
+        // // if ((merit_try_ <= ub_) || steplength_ == alphas_.back()) {
         //     setCandidate(xs_try_, us_try_, false);
         //     recalcDiff = true;
         //     if(steplength_ == alphas_.back()){
@@ -171,6 +162,15 @@ bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::ve
         //     }
         //     break;
         // }
+        // filter line search criteria
+        if ((merit_try_ <= merit_ ) || (steplength_ == alphas_.back())){
+            setCandidate(xs_try_, us_try_, false);
+            recalcDiff = true;
+            if(steplength_ == alphas_.back()){
+              fail_time_tmp_ ++;
+            }
+            break;
+          }
         }
     }
     else{
@@ -434,11 +434,7 @@ double SolverGRG::tryStep(const double steplength) {
           throw_pretty("step_error");
         }   
 
-        if (t > 0){
-          const boost::shared_ptr<ActionDataAbstract>& d_prev = datas[t-1];
-          m->get_state()->diff(xs_try_[t], d_prev->xnext, fs_try_[t-1]);
-          gap_norm_try_ += fs_try_[t].lpNorm<1>(); 
-        } 
+    
     }
 
     #ifdef CROCODDYL_WITH_MULTITHREADING
