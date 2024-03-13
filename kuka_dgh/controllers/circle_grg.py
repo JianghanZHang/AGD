@@ -45,8 +45,8 @@ def solveOCP(q, v, solver, nb_iter, target_reach, TASK_PHASE):
     # solver.KKT = 100.
     
     # return solver.us[0], solver.xs[1], solver.K[0], solve_time - t, solver.iter, 100, solver.cost#solver.KKT, solver.cost
-    # KKT = solver.stop
-    KKT = solver.KKT
+    KKT = solver.stop
+    # KKT = solver.KKT
     return solver.us[0], solver.xs[1], None , solve_time - t, solver.iter, KKT, solver.cost
 
 
@@ -105,7 +105,7 @@ class KukaCircleSGRG:
             self.solver.beta1 = 0.8
             self.solver.beta2 = 0.8
             # self.solver.use_line_search = True
-            self.solver.const_step_length = 0.01
+            self.solver.const_step_length = 0.1
             self.solver.with_callbacks = False
         elif(config['SOLVER'] == 'grg_h'):
             logger.warning("Using the GRG_H solver.")

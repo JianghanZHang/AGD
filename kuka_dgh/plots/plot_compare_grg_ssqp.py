@@ -62,16 +62,23 @@ if(SIM):
     # data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_h_CODE_SPRINT'
 
     #T = 100 @100HZ
-    data_name = 'circle_grg_SIM_2024-03-07T18:11:37.435691_grg_CODE_SPRINT'
-    data_name1 = 'circle_grg_SIM_2024-03-07T14:27:17.483247_sqp_CODE_SPRINT'
-    data_name2 = 'circle_grg_SIM_2024-03-07T16:13:59.509181_ddp_CODE_SPRINT'
-    data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_h_CODE_SPRINT'
+    # data_name = 'circle_grg_SIM_2024-03-07T18:11:37.435691_grg_CODE_SPRINT'
+    # data_name1 = 'circle_grg_SIM_2024-03-07T14:27:17.483247_sqp_CODE_SPRINT'
+    # data_name2 = 'circle_grg_SIM_2024-03-07T16:13:59.509181_ddp_CODE_SPRINT'
+    # data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_h_CODE_SPRINT'
 
-    #T = 20 @1000HZ
-    # data_name = 'circle_grg_SIM_2024-03-07T14:52:36.351751_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-05T17:11:19.106560_sqp_CODE_SPRINT'
-    # data_name2 =  'circle_grg_SIM_2024-03-05T17:10:26.681366_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-05T17:08:45.175145_grg_h_CODE_SPRINT'
+    # T = 10 @ 1000HZ
+    data_name = 'circle_grg_SIM_2024-03-12T15:11:06.823127_grg_CODE_SPRINT'
+    data_name1 = 'circle_grg_SIM_2024-03-12T15:11:57.768707_sqp_CODE_SPRINT'
+    data_name2 =  'circle_grg_SIM_2024-03-12T15:14:48.667608_ddp_CODE_SPRINT'
+    data_name3 = 'circle_grg_SIM_2024-03-12T15:11:06.823127_grg_CODE_SPRINT'
+
+
+    # T = 20 @ 500HZ
+    # data_name = 'circle_grg_SIM_2024-03-12T14:55:02.594638_grg_CODE_SPRINT'
+    # data_name1 = 'circle_grg_SIM_2024-03-12T14:54:07.936979_sqp_CODE_SPRINT'
+    # data_name2 =  'circle_grg_SIM_2024-03-12T14:57:48.668278_ddp_CODE_SPRINT'
+    # data_name3 = 'circle_grg_SIM_2024-03-12T14:55:02.594638_grg_CODE_SPRINT'
 
     
 
@@ -84,7 +91,7 @@ r       = DataReader(data_path+data_name+'.mds')
 r1      = DataReader(data_path+data_name1+'.mds')
 r2      = DataReader(data_path+data_name2+'.mds')
 r3     = DataReader(data_path+data_name3+'.mds')
-r3.date = None
+# r3.data = None
 # r3      = DataReader(data_path+data_name3+'.mds')
 N       = r.data['absolute_time'].shape[0]
 print("Total number of control cycles = ", N)
