@@ -6,12 +6,10 @@ import matplotlib.pyplot as plt
 import os 
 os.sys.path.insert(1, '../')
 from demos import launch_utils
+from mim_robots.robot_list import MiM_Robots
+from mim_robots.robot_loader import load_bullet_wrapper, load_pinocchio_wrapper
 
-
-from robot_properties_kuka.config import IiwaConfig
-
-iiwa_config = IiwaConfig()
-pinrobot    = iiwa_config.buildRobotWrapper()
+pinrobot    = load_pinocchio_wrapper('iiwa')
 model       = pinrobot.model
 data        = model.createData()
 frameId     = model.getFrameId('contact')
@@ -40,7 +38,7 @@ if(SIM):
     # data_name = 'circle_grg_SIM_2024-03-04T17:42:07.020835_grg_CODE_SPRINT'
     # data_name = 'circle_grg_SIM_2024-03-04T17:46:20.071680_grg_CODE_SPRINT'
     # data_name = 'circle_grg_SIM_2024-03-04T17:51:14.243793_grg_CODE_SPRINT'
-    
+    data_name = 'circle_grg_SIM_2024-03-15T15:57:29.186365_grg_CODE_SPRINT'
 else:
     data_path = 'data/unconstrained/new/'
     data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
