@@ -1,9 +1,7 @@
 import numpy as np
 import pinocchio as pin 
 import sys
-sys.path.append('..')
-sys.path.append('../../build/bindings/grg_pywrap')
-import grg_pywrap as grg
+import grg
 import mim_solvers
 import crocoddyl
 
