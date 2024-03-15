@@ -30,15 +30,8 @@ s = SimpleDataPlotter()
 
 if(SIM):
     data_path = '/tmp/'
-    # data_name = 'circle_grg_SIM_2024-02-29T17:54:59.989210_grg_CODE_SPRINT' 
-    # data_name = 'circle_grg_SIM_2024-03-04T17:28:21.843622_grg_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T17:31:24.589946_grg_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T17:32:54.775645_grg_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T17:35:46.683461_grg_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T17:42:07.020835_grg_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T17:46:20.071680_grg_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-04T17:51:14.243793_grg_CODE_SPRINT'
-    data_name = 'circle_grg_SIM_2024-03-15T16:18:53.235453_grg'
+    # data_name = 'circle_grg_SIM_2024-03-15T16:18:53.235453_grg'
+    data_name = 'circle_grg_SIM_2024-03-15T16:23:43.265774_grg'
 else:
     data_path = 'data/unconstrained/new/'
     data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
