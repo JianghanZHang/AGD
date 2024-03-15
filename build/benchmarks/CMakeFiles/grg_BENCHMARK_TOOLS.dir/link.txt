@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,libgrg_BENCHMARK_TOOLS.so -o libgrg_BENCHMARK_TOOLS.so CMakeFiles/grg_BENCHMARK_TOOLS.dir/timings.cpp.o 
