@@ -1,7 +1,7 @@
 import yaml
 import os
 import sys
-sys.path.append('../')
+sys.path.append('.')
 from croco_mpc_utils.utils import CustomLogger, GLOBAL_LOG_LEVEL, GLOBAL_LOG_FORMAT
 logger = CustomLogger(__name__, GLOBAL_LOG_LEVEL, GLOBAL_LOG_FORMAT).logger
 
@@ -29,7 +29,7 @@ def is_valid_exp_name(EXP_NAME):
         logger.error("Error : config file name must be in "+str(SUPPORTED_EXPERIMENTS))
         
         
-def load_config_file(EXP_NAME, path_prefix='../'):
+def load_config_file(EXP_NAME, path_prefix=''):
     '''
     Load YAML config file corresponding to an experiment name
     '''
@@ -48,16 +48,9 @@ def import_mpc_controller(EXP_NAME):
     is_valid_exp_name(EXP_NAME)
     if(EXP_NAME == 'circle_grg'):     
         from controllers.circle_grg  import KukaCircleSGRG as MPCController
-    elif(EXP_NAME == 'circle_ssqp'):  
-        from controllers.circle_ssqp  import KukaCircleSSQP  as MPCController
-    elif(EXP_NAME == 'circle_cssqp'): 
-        from controllers.circle_cssqp import KukaCircleCSSQP as MPCController
     elif(EXP_NAME == 'square_cssqp'): 
         from controllers.square_cssqp import KukaSquareCSSQP as MPCController
-    elif(EXP_NAME == 'plane_cssqp'):  
-        from controllers.plane_cssqp  import KukaPlaneCSSQP  as MPCController
-    elif(EXP_NAME == 'line_cssqp'):  
-        from controllers.line_cssqp  import KukaLineCSSQP  as MPCController
+
     logger.debug("Imported MPC controller for experiment : "+str(EXP_NAME))
     
     logger.debug("Imported MPC controller for experiment : "+str(EXP_NAME))
@@ -71,18 +64,8 @@ def get_log_config(EXP_NAME):
     is_valid_exp_name(EXP_NAME)
     if(EXP_NAME == 'circle_grg'):
         log_config = GRG_LOGS_CIRCLE
-    elif(EXP_NAME == 'reach_ssqp'):     
-        log_config = SSQP_LOGS_REACH
-    elif(EXP_NAME == 'circle_ssqp'):  
-        log_config = SSQP_LOGS_CIRCLE
-    elif(EXP_NAME == 'circle_cssqp'): 
-        log_config = CSSQP_LOGS_CIRCLE
     elif(EXP_NAME == 'square_cssqp'): 
         log_config = CSSQP_LOGS_SQUARE
-    elif(EXP_NAME == 'plane_cssqp'):  
-        log_config = CSSQP_LOGS_PLANE
-    elif(EXP_NAME == 'line_cssqp'):  
-        log_config = CSSQP_LOGS_LINE
     logger.debug("Data log fields : "+str(log_config))
     return log_config
 
