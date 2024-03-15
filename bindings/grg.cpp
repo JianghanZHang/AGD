@@ -84,7 +84,9 @@ void exposeSolverGRG() {
                     "Penalty term for dynamic violation in the merit function (default: 0.)")
 
       .add_property("termination_tolerance", bp::make_function(&SolverGRG::get_termination_tolerance), bp::make_function(&SolverGRG::set_termination_tolerance),
-                    "Termination criteria to exit the iteration (default: 1e-6)");
+                    "Termination criteria to exit the iteration (default: 1e-6)")
+
+      .add_property("with_multithreading", bp::make_function(&SolverGRG::getMultithreading), "Activates the multithreading when true (default: False)");
      
 }
 

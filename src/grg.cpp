@@ -25,7 +25,7 @@ SolverGRG::SolverGRG(boost::shared_ptr<crocoddyl::ShootingProblem> problem)
         }
         
       #ifdef CROCODDYL_WITH_MULTITHREADING
-      std::cout << "Built with multithreading" << std::endl;
+      with_multithreading_ = true;
       #endif  // CROCODDYL_WITH_MULTITHREADING
 
       const std::size_t T = problem_->get_T();

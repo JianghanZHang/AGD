@@ -74,6 +74,7 @@ class SolverGRG : public crocoddyl::SolverAbstract {
   double get_termination_tolerance() const { return termination_tol_; };
   double get_line_search_parameter() const { return c_; };
   double get_curvature() const { return curvature_; };
+  bool getMultithreading() const { return with_multithreading_; };
 
   void printCallbacks();
   void setCallbacks(bool inCallbacks);
@@ -148,6 +149,7 @@ class SolverGRG : public crocoddyl::SolverAbstract {
   double state_ub_ = 4;                                      //!< State upper bound
   double state_lb_ = -4;                                     //!< State lower bound
   int fail_time_tmp_ = 0;                                     //!< Temporary variable
+  bool with_multithreading_ = false;                            //!< Boolean for multi-threading
   
  private:
   double th_acceptnegstep_;                                    //!< Threshold used for accepting step along ascent direction

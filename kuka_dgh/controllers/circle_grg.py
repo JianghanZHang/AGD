@@ -99,6 +99,7 @@ class KukaCircleSGRG:
             self.solver.beta2 = 0.8
             # self.solver.use_line_search = True
             self.solver.const_step_length = 0.1
+            print("Solver with multithreading = ", self.solver.with_multithreading)
             self.solver.with_callbacks = False
         elif(config['SOLVER'] == 'grg_h'):
             logger.warning("Using the GRG_H solver.")
