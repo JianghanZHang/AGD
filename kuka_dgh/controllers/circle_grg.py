@@ -40,12 +40,7 @@ def solveOCP(q, v, solver, nb_iter, target_reach, TASK_PHASE):
     solver.solve(xs_init, us_init, nb_iter)
     solve_time = time.time()
 
-    # solver.KKT = 100.
-    
-    # return solver.us[0], solver.xs[1], solver.K[0], solve_time - t, solver.iter, 100, solver.cost#solver.KKT, solver.cost
-    KKT = solver.stop
-    # KKT = solver.KKT
-    return solver.us[0], solver.xs[1], None , solve_time - t, solver.iter, KKT, solver.cost
+    return solver.us[0], solve_time - t, solver.iter, solver.KKT, solver.cost
 
 
   
@@ -182,12 +177,12 @@ class KukaCircleSGRG:
         self.u0 = pin_utils.get_u_grav(self.q0, self.robot.model, np.zeros(self.robot.model.nq))
         self.solver.xs = [self.x0 for i in range(self.config['N_h']+1)]
         self.solver.us = [self.u0 for i in range(self.config['N_h'])]
-        self.tau_ff, self.x_des, self.K, self.t_child, self.ddp_iter, self.KKT, self.cost = solveOCP(self.joint_positions, 
-                                                                                          self.joint_velocities, 
-                                                                                          self.solver, 
-                                                                                          self.nb_iter,
-                                                                                          self.target_position,
-                                                                                          self.TASK_PHASE)
+        self.tau_ff, self.t_child, self.ddp_iter, self.KKT, self.cost = solveOCP(self.joint_positions, 
+                                                                                self.joint_velocities, 
+                                                                                self.solver, 
+                                                                                self.nb_iter,
+                                                                                self.target_position,
+                                                                                self.TASK_PHASE)
         self.nb_iter = self.config['maxiter']
 
 
@@ -230,12 +225,12 @@ class KukaCircleSGRG:
         # # # # # # #  
         # Solve OCP #
         # # # # # # #  
-        self.tau_ff, self.x_des, self.K, self.t_child, self.ddp_iter, self.KKT, self.cost = solveOCP(q, 
-                                                                                          v, 
-                                                                                          self.solver,
-                                                                                          self.nb_iter,
-                                                                                          self.target_position,
-                                                                                          self.TASK_PHASE)
+        self.tau_ff, self.t_child, self.ddp_iter, self.KKT, self.cost = solveOCP(q, 
+                                                                                v, 
+                                                                                self.solver,
+                                                                                self.nb_iter,
+                                                                                self.target_position,
+                                                                                self.TASK_PHASE)
         
         # # # # # # # # 
         # Send policy #

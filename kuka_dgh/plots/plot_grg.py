@@ -38,7 +38,7 @@ if(SIM):
     # data_name = 'circle_grg_SIM_2024-03-04T17:42:07.020835_grg_CODE_SPRINT'
     # data_name = 'circle_grg_SIM_2024-03-04T17:46:20.071680_grg_CODE_SPRINT'
     # data_name = 'circle_grg_SIM_2024-03-04T17:51:14.243793_grg_CODE_SPRINT'
-    data_name = 'circle_grg_SIM_2024-03-15T15:57:29.186365_grg_CODE_SPRINT'
+    data_name = 'circle_grg_SIM_2024-03-15T16:18:53.235453_grg'
 else:
     data_path = 'data/unconstrained/new/'
     data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
@@ -64,7 +64,7 @@ for i in range(4):
 
 
 s.plot_joint_pos( [r.data['joint_positions'], 
-                   r.data['x_des'][:,:nq]], 
+                   ], 
                    ['mea', 
                     'pred'], 
                    ['r', 
@@ -109,7 +109,6 @@ else:
                   linestyle=['dotted', 'solid', 'solid', 'solid', 'solid'])
 
 p_mea = get_p_(r.data['joint_positions'], pinrobot.model, pinrobot.model.getFrameId('contact'))
-p_des = get_p_(r.data['x_des'][:,:nq], pinrobot.model, pinrobot.model.getFrameId('contact'))
 
 if(EXP_NAME == 'reach_ssqp'):
     target_position = r.data['target_position'] #np.zeros((N,3))
@@ -167,7 +166,7 @@ ALPHA = 0.8
 
 print("PLOTTING")
 
-fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex='col', figsize=(55, 13.5))
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex='col', figsize=(20, 8))
  
 
 ax1.grid(linewidth=1) 
