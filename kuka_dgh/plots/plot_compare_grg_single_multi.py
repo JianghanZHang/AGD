@@ -35,53 +35,9 @@ s = SimpleDataPlotter()
 
 if(SIM):
     data_path = '/tmp/'
-    
-    #T = 10 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-07T14:08:19.232817_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-01T14:09:07.930336_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-01T13:57:35.403756_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-07T14:47:12.383938_grg_single_thread_CODE_SPRINT'
 
-    #T = 20 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-04T18:16:16.567219_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-01T14:08:23.138874_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-01T14:11:48.881412_ddp_CODE_SPRINT'
-
-    #T = 30 @100HZ
-    # data_name3 = 'circle_grg_SIM_2024-03-07T14:23:30.121217_grg_single_thread_CODE_SPRINT'
-    # data_name = 'circle_grg_SIM_2024-03-07T14:13:45.760076_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-01T14:18:24.556685_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-01T14:15:06.186234_ddp_CODE_SPRINT'
-
-    #T = 40 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-04T18:17:52.883502_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-01T14:21:49.120390_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-01T14:23:55.574577_ddp_CODE_SPRINT'
-
-    #T = 50 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-07T14:10:59.634363_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-07T14:27:17.483247_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-07T14:40:12.459942_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_single_thread_CODE_SPRINT'
-
-    #T = 100 @100HZ
-    # data_name = 'circle_grg_SIM_2024-03-07T18:11:37.435691_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-07T14:27:17.483247_sqp_CODE_SPRINT'
-    # data_name2 = 'circle_grg_SIM_2024-03-07T16:13:59.509181_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-07T14:26:04.789367_grg_single_thread_CODE_SPRINT'
-
-    # T = 10 @ 1000HZ
-    # data_name = 'circle_grg_SIM_2024-03-12T15:11:06.823127_grg_CODE_SPRINT'
-    # data_name1 = 'circle_grg_SIM_2024-03-12T15:11:57.768707_sqp_CODE_SPRINT'
-    # data_name2 =  'circle_grg_SIM_2024-03-12T15:14:48.667608_ddp_CODE_SPRINT'
-    # data_name3 = 'circle_grg_SIM_2024-03-12T15:11:06.823127_grg_CODE_SPRINT'
-
-
-    # T = 20 @ 500HZ
-    data_name = 'circle_grg_SIM_2024-03-18T13:55:16.550155_grg'
-    data_name1 = 'circle_grg_SIM_2024-03-12T14:54:07.936979_sqp_CODE_SPRINT'
-    data_name2 =  'circle_grg_SIM_2024-03-12T14:57:48.668278_ddp_CODE_SPRINT'
-    data_name3 = 'circle_grg_SIM_2024-03-18T14:07:18.705222_grg'
+    data_name = 'circle_grg_SIM_2024-03-18T14:31:23.780511_grg' #multi threading
+    data_name3 = 'circle_grg_SIM_2024-03-18T14:33:14.930491_grg' #single threading
 
     
 
@@ -91,8 +47,6 @@ else:
     data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
 
 r       = DataReader(data_path+data_name+'.mds')
-r1      = DataReader(data_path+data_name1+'.mds')
-r2      = DataReader(data_path+data_name2+'.mds')
 r3     = DataReader(data_path+data_name3+'.mds')
 # r1.data = {}
 # r2.data = {}
@@ -104,25 +58,17 @@ time_lin = np.linspace(0, N/config['ctrl_freq'], N)
 
 fig, ax = plt.subplots(4, 1, sharex='col') 
 ax[0].plot(r.data['KKT'], label='KKT residual GRG')
-ax[0].plot(r1.data['KKT'], label='KKT residual SSQP')
-ax[0].plot(r2.data['KKT'], label='KKT residual DDP')
 ax[0].plot(r3.data['KKT'], label='KKT residual grg_single_thread')
 ax[0].plot(N*[config['solver_termination_tolerance']], label= 'KKT residual tolerance', color = 'r')
 
 ax[1].plot(r.data['ddp_iter'], label='# solver iterations GRG')
-ax[1].plot(r1.data['ddp_iter'], label='# solver iterations SSQP')
-ax[1].plot(r2.data['ddp_iter'], label='# solver iterations DDP')
 ax[1].plot(r3.data['ddp_iter'], label='# solver iterations grg_single_thread')
 
 ax[2].plot(r.data['t_child']*1000, label='OCP solve time GRG')
-ax[2].plot(r1.data['t_child']*1000, label='OCP solve time SSQP')
-ax[2].plot(r2.data['t_child']*1000, label='OCP solve time DDP')
 ax[2].plot(r3.data['t_child']*1000, label='OCP solve time grg_single_thread')
 ax[2].plot(N*[1000./config['ctrl_freq']], label= 'dt_MPC', color='r')
 
 ax[3].plot((r.data['timing_control'])* 1000, label='Control cycle time GRG' )
-ax[3].plot((r1.data['timing_control'])* 1000, label='Control cycle time SSQP' )
-ax[3].plot((r2.data['timing_control'])* 1000, label='Control cycle time DDP' )
 ax[3].plot((r3.data['timing_control'])* 1000, label='Control cycle time grg_single_thread' )
 
 ax[3].plot(N*[1000./config['ctrl_freq']], label= 'dt_MPC', color='r')
@@ -132,16 +78,10 @@ for i in range(4):
 
 
 s.plot_joint_pos( [r.data['joint_positions'], 
-                   r1.data['joint_positions'],
-                   r2.data['joint_positions'],
-                   r1.data['x_des'][:,:nq]], 
+                   r3.data['joint_positions']], 
                    ['mea_grg',
-                    'mea_ssqp',
-                    'mea_ddp',  
-                    'pred'], 
+                    'single_thread'], 
                    ['r', 
-                    'g',
-                    'y',
                     'b'],
                    ylims=[model.lowerPositionLimit, model.upperPositionLimit] )
 
@@ -153,17 +93,10 @@ s.plot_joint_pos( [r.data['joint_positions'],
 # For SIM robot only
 if(SIM):
     s.plot_joint_tau( [r.data['tau'], 
-                       r1.data['tau'],
-                       r2.data['tau'],
-                       r1.data['tau_ff']],
-                    #    r.data['tau_riccati'], 
-                    #    r.data['tau_gravity']], 
+                       r3.data['tau_ff']],
                       ['total grg', 
-                       'total ssqp',
-                       'total ddp',
+                       'total grg_single_thread',
                        'ff'], 
-                    #    'riccati', 
-                    #    'gravity'], 
                       ['r', 
                        'g', 
                        'y',
@@ -189,8 +122,6 @@ else:
                   linestyle=['dotted', 'solid', 'solid', 'solid', 'solid'])
 
 p_mea = get_p_(r.data['joint_positions'], pinrobot.model, pinrobot.model.getFrameId('contact'))
-p_mea1 = get_p_(r1.data['joint_positions'], pinrobot.model, pinrobot.model.getFrameId('contact'))
-p_mea2 = get_p_(r2.data['joint_positions'], pinrobot.model, pinrobot.model.getFrameId('contact'))
 p_mea3 = get_p_(r3.data['joint_positions'], pinrobot.model, pinrobot.model.getFrameId('contact'))
 
 if(EXP_NAME == 'reach_ssqp'):
@@ -201,21 +132,15 @@ else:
     target_position[:,1] = r.data['target_position_y'][:,0]
     target_position[:,2] = r.data['target_position_z'][:,0]
 s.plot_ee_pos( [p_mea, 
-                p_mea1,
-                p_mea2,
                 p_mea3,
                 target_position],  
                ['mea_grg',
-                'mea_ssqp', 
-                'mea_ddp',
                 'mea_grg_single_thread',
                 'ref (position cost)'], 
                ['r',  
-                'g', 
-                'yellow',
                 'blue',
                 'k'], 
-               linestyle=['solid', 'solid', 'solid', 'solid', 'dotted'])
+               linestyle=['solid', 'solid', 'dotted'])
 
 
 
@@ -295,72 +220,6 @@ ax1.plot(time_lin2, state_cost_,  linewidth=LINEWIDTH, label='grg')
 ax2.plot(time_lin2, tau_cost_, linewidth=LINEWIDTH, label='grg')
 ax3.plot(time_lin2, translation_cost_, linewidth=LINEWIDTH, label='grg')
 ax4.plot(time_lin2, total_cost_, linewidth=LINEWIDTH, label='grg')
-
-state_cost_list       = []
-tau_cost_list         = []
-translation_cost_list = []
-total_cost_list       = []
-N_START = int(config['T_CIRCLE']*config['ctrl_freq'])
-for index in range(N_START, N):
-    state_mea = np.concatenate([r1.data['joint_positions'][index,:], r1.data['joint_velocities'][index,:]])
-    tau_mea   = r1.data['tau_ff'][index, :]
-    state_ref = np.array([0., 1.0471975511965976, 0., -1.1344640137963142, 0.2,  0.7853981633974483, 0, 0.,0.,0.,0.,0.,0.,0.])
-    tau_ref   = r1.data['tau_gravity'][index,:]
-    
-    state_cost = 0.5 * config['stateRegWeight'] * (state_mea - state_ref).T @ np.diag(config['stateRegWeights'])**2 @ (state_mea - state_ref)
-    state_cost_list.append(state_cost)
-
-    tau_cost = 0.5 * config['ctrlRegGravWeight'] * (tau_mea - tau_ref).T @ np.diag(config['ctrlRegGravWeights'])**2 @ (tau_mea - tau_ref)
-    tau_cost_list.append(tau_cost)
-
-    translation_cost = 0.5 * config['frameTranslationWeight'] * (p_mea1[index, :] - target_position[index, :]).T @ np.diag(config['frameTranslationWeights'])**2 @ (p_mea1[index, :] - target_position[index, :])
-    translation_cost_list.append(translation_cost)
-    
-    total_cost = state_cost + tau_cost + translation_cost
-    total_cost_list.append(total_cost)
-state_cost_       = np.array(state_cost_list).reshape(-1, 1)
-tau_cost_         = np.array(tau_cost_list).reshape(-1, 1)
-translation_cost_ = np.array(translation_cost_list).reshape(-1, 1)
-total_cost_       = np.array(total_cost_list).reshape(-1, 1)
-
-time_lin2 = time_lin[N_START:N]
-ax1.plot(time_lin2, state_cost_,  linewidth=LINEWIDTH, label='ssqp')
-ax2.plot(time_lin2, tau_cost_, linewidth=LINEWIDTH, label='ssqp')
-ax3.plot(time_lin2, translation_cost_, linewidth=LINEWIDTH, label='ssqp')
-ax4.plot(time_lin2, total_cost_, linewidth=LINEWIDTH, label='ssqp')
-
-state_cost_list       = []
-tau_cost_list         = []
-translation_cost_list = []
-total_cost_list       = []
-N_START = int(config['T_CIRCLE']*config['ctrl_freq'])
-for index in range(N_START, N):
-    state_mea = np.concatenate([r2.data['joint_positions'][index,:], r2.data['joint_velocities'][index,:]])
-    tau_mea   = r2.data['tau_ff'][index, :]
-    state_ref = np.array([0., 1.0471975511965976, 0., -1.1344640137963142, 0.2,  0.7853981633974483, 0, 0.,0.,0.,0.,0.,0.,0.])
-    tau_ref   = r2.data['tau_gravity'][index,:]
-    
-    state_cost = 0.5 * config['stateRegWeight'] * (state_mea - state_ref).T @ np.diag(config['stateRegWeights'])**2 @ (state_mea - state_ref)
-    state_cost_list.append(state_cost)
-
-    tau_cost = 0.5 * config['ctrlRegGravWeight'] * (tau_mea - tau_ref).T @ np.diag(config['ctrlRegGravWeights'])**2 @ (tau_mea - tau_ref)
-    tau_cost_list.append(tau_cost)
-
-    translation_cost = 0.5 * config['frameTranslationWeight'] * (p_mea2[index, :] - target_position[index, :]).T @ np.diag(config['frameTranslationWeights'])**2 @ (p_mea2[index, :] - target_position[index, :])
-    translation_cost_list.append(translation_cost)
-    
-    total_cost = state_cost + tau_cost + translation_cost
-    total_cost_list.append(total_cost)
-state_cost_       = np.array(state_cost_list).reshape(-1, 1)
-tau_cost_         = np.array(tau_cost_list).reshape(-1, 1)
-translation_cost_ = np.array(translation_cost_list).reshape(-1, 1)
-total_cost_       = np.array(total_cost_list).reshape(-1, 1)
-
-time_lin2 = time_lin[N_START:N]
-ax1.plot(time_lin2, state_cost_,  linewidth=LINEWIDTH, label='ddp')
-ax2.plot(time_lin2, tau_cost_, linewidth=LINEWIDTH, label='ddp')
-ax3.plot(time_lin2, translation_cost_, linewidth=LINEWIDTH, label='ddp')
-ax4.plot(time_lin2, total_cost_, linewidth=LINEWIDTH, label='ddp')
 
 state_cost_list       = []
 tau_cost_list         = []

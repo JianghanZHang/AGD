@@ -42,16 +42,15 @@ include(CMakeDependentOption)
 
 # Project dependencies
 find_package(console_bridge REQUIRED)
-
-
+find_package(crocoddyl REQUIRED)
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(OpenMP REQUIRED COMPONENTS CXX)
 
 # set(crocoddyl_INCLUDE_DIRS "/opt/openrobots/include")
 # set(CROCODDYL_LIBRARY "/opt/openrobots/lib/")
 
-# message(STATUS "Crocoddyl include directory: ${crocoddyl_INCLUDE_DIRS}")
-# message(STATUS "Crocoddyl library: ${crocoddyl_LIBRARIES}")
+message(STATUS "Crocoddyl include directory: ${crocoddyl_INCLUDE_DIRS}")
+message(STATUS "Crocoddyl library: ${crocoddyl_LIBRARIES}")
 
 # Assuming you know crocoddyl was compiled with multithreading support
 

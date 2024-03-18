@@ -34,7 +34,8 @@ s = SimpleDataPlotter()
 
 if(SIM):
     data_path = '/tmp/'
-    data_name = 'circle_grg_SIM_2024-03-15T16:23:43.265774_grg'
+    data_name = 'circle_grg_SIM_2024-03-15T16:23:43.265774_grg' #single threading
+    # data_name = 'circle_grg_SIM_2024-03-18T13:55:16.550155_grg' #multi threading
 else:
     data_path = 'data/unconstrained/new/'
     data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
