@@ -2,7 +2,7 @@ import pybullet as p
 import numpy as np
 from dynamic_graph_head import ThreadHead, SimHead, HoldPDController
 from datetime import datetime
-# import dynamic_graph_manager_cpp_bindings
+import dynamic_graph_manager_cpp_bindings
 from mim_robots.robot_loader import load_bullet_wrapper, load_pinocchio_wrapper
 from mim_robots.pybullet.env import BulletEnvWithGround
 from mim_robots.robot_list import MiM_Robots
@@ -19,7 +19,7 @@ import launch_utils
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Choose experiment, load config and import controller  #  
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-SIM           = True
+SIM           = False
 EXP_NAME      = 'circle_grg' # <<<<<<<<<<<<< Choose experiment here (cf. launch_utils)
 config        = launch_utils.load_config_file(EXP_NAME)
 MPCController = launch_utils.import_mpc_controller(EXP_NAME)
@@ -81,7 +81,7 @@ thread_head.switch_controllers(ctrl)
 # Data logging  #
 # # # # # # # # # <<<<<<<<<<<<< Choose data save path & log config here (cf. launch_utils)
 # prefix     = "/home/skleff/data_sqp_paper_croc2/constrained/circle/"
-prefix     = "/tmp/"
+prefix     = "/home/armand/data/grg/"
 suffix     = "_"+config['SOLVER']
 LOG_FIELDS = launch_utils.get_log_config(EXP_NAME) 
 # print(LOG_FIELDS)
@@ -104,6 +104,6 @@ if SIM:
     thread_head.stop_logging()
 else:
     thread_head.start()
-    thread_head.start_logging(50, prefix+EXP_NAME+"_REAL_"+str(datetime.now().isoformat())+suffix+".mds", LOG_FIELDS=LOG_FIELDS)
+    thread_head.start_logging(20, prefix+EXP_NAME+"_REAL_"+str(datetime.now().isoformat())+suffix+".mds", LOG_FIELDS=LOG_FIELDS)
     
 thread_head.plot_timing() # <<<<<<<<<<<<< Comment out to skip timings plot

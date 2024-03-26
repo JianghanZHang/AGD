@@ -97,9 +97,9 @@ class KukaCircleSGRG:
             self.solver.beta1 = 0.8
             self.solver.beta2 = 0.8
             self.solver.const_step_length = 0.1
-            print("Solver with multithreading = ", self.solver.with_multithreading)
+            # print("Solver with multithreading = ", self.solver.with_multithreading)
             # import pdb; pdb.set_trace()
-            print("Number of threads=", problem.nthreads)
+            # print("Number of threads=", problem.nthreads)
             self.solver.with_callbacks = False
         elif(config['SOLVER'] == 'grg_h'):
             logger.warning("Using the GRG_H solver.")
@@ -153,7 +153,7 @@ class KukaCircleSGRG:
         self.pdes = np.asarray(self.config['frameTranslationRef']) 
     
         # radius = 0.15 ; omega = 3.
-        radius = 0.3 ; omega = 2.
+        radius = 0.15 ; omega = 2.
         self.target_position_traj[0:N_circle, :] = [np.array([self.pdes[0],
                                                               self.pdes[1] + radius * np.sin(i*self.dt_ctrl*omega), 
                                                               self.pdes[2] + radius * (1-np.cos(i*self.dt_ctrl*omega)) ]) for i in range(N_circle)]
@@ -175,7 +175,7 @@ class KukaCircleSGRG:
         self.cost = 0.
         
     def warmup(self, thread):
-        self.nb_iter = 100        
+        self.nb_iter = 10000        
         self.u0 = pin_utils.get_u_grav(self.q0, self.robot.model, np.zeros(self.robot.model.nq))
         self.solver.xs = [self.x0 for i in range(self.config['N_h']+1)]
         self.solver.us = [self.u0 for i in range(self.config['N_h'])]

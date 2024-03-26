@@ -24,7 +24,7 @@ model.effortLimit = np.array([100, 100, 50, 50, 20, 10, 10])
 
 
 # Load config file
-SIM           = True
+SIM           = False
 EXP_NAME      = 'circle_grg' # <<<<<<<<<<<<< Choose experiment here (cf. launch_utils)
 config        = launch_utils.load_config_file(EXP_NAME)
 
@@ -33,12 +33,12 @@ config        = launch_utils.load_config_file(EXP_NAME)
 s = SimpleDataPlotter()
 
 if(SIM):
-    data_path = '/tmp/'
-    data_name = 'circle_grg_SIM_2024-03-15T16:23:43.265774_grg' #single threading
+    data_path = '/home/armand/data/grg/'
+    data_name = 'circle_grg_SIM_2024-03-26T13:28:28.227728_grg' #single threading
     # data_name = 'circle_grg_SIM_2024-03-18T13:55:16.550155_grg' #multi threading
 else:
-    data_path = 'data/unconstrained/new/'
-    data_name = 'circle_ssqp_REAL_2023-10-31T17:06:02.992743_fddp' 
+    data_path = '/home/armand/data/grg/'
+    data_name = 'circle_grg_REAL_2024-03-26T13:30:41.844191_grg' 
 
 r       = DataReader(data_path+data_name+'.mds')
 N       = r.data['absolute_time'].shape[0]
