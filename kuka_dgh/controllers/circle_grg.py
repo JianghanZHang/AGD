@@ -2,7 +2,6 @@ import numpy as np
 import pinocchio as pin 
 import sys
 import grg
-import mim_solvers
 import crocoddyl
 
 import time
@@ -97,9 +96,10 @@ class KukaCircleSGRG:
             self.solver = grg.SolverGRG(problem)
             self.solver.beta1 = 0.8
             self.solver.beta2 = 0.8
-            # self.solver.use_line_search = True
             self.solver.const_step_length = 0.1
             print("Solver with multithreading = ", self.solver.with_multithreading)
+            # import pdb; pdb.set_trace()
+            print("Number of threads=", problem.nthreads)
             self.solver.with_callbacks = False
         elif(config['SOLVER'] == 'grg_h'):
             logger.warning("Using the GRG_H solver.")
@@ -112,6 +112,7 @@ class KukaCircleSGRG:
             self.solver.with_callbacks = False
             
         elif(config['SOLVER'] == 'sqp'):
+            import mim_solvers
             logger.warning("Using the SSQP solver.")
             self.solver = mim_solvers.SolverSQP(problem)
 
