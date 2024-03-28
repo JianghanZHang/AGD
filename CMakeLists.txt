@@ -69,12 +69,15 @@ endif()
 set(${PROJECT_NAME}_HEADERS
   include/${PROJECT_NAME}/grg.hpp
   include/${PROJECT_NAME}/grg_adahessian.hpp
+  include/${PROJECT_NAME}/grg_nonlinear.hpp
+
 
   )
 
 set(${PROJECT_NAME}_SOURCES
   src/grg.cpp
   src/grg_adahessian.cpp
+  src/grg_nonlinear.cpp
   )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})

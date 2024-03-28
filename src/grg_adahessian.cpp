@@ -204,7 +204,6 @@ void SolverGRG_ADAHESSIAN::computeDirection(const bool recalcDiff){
     gap_norm_ += fs_[t].lpNorm<1>();   
   }
   gap_norm_ += fs_.back().lpNorm<1>();   
-
   merit_ = cost_ + mu_*gap_norm_;
 
   backwardPass();

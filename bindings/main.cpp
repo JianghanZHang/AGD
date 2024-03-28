@@ -16,4 +16,5 @@ BOOST_PYTHON_MODULE(grg_pywrap) {
 
     grg::exposeSolverGRG();
     grg::exposeSolverGRG_ADAHESSIAN();
+    grg::exposeSolverGRG_nonlinear();
 }

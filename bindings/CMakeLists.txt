@@ -6,6 +6,7 @@ set(${PY_NAME}_SOURCES
   main.cpp
   grg.cpp
   grg_adahessian.cpp
+  grg_nonlinear.cpp
   )
 
 
