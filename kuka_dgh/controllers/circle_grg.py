@@ -96,13 +96,12 @@ class KukaCircleSGRG:
         # Initialize the solver
         if(config['SOLVER'] == 'grg'):
             logger.warning("Using the GRG solver.")
-            self.solver = grg.SolverGRG(problem)
+            self.solver = grg.SolverGRG_nonlinear(problem)
             self.solver.beta1 = 0.8
             self.solver.beta2 = 0.8
             self.solver.const_step_length = 0.1
-            # print("Solver with multithreading = ", self.solver.with_multithreading)
-            # import pdb; pdb.set_trace()
-            # print("Number of threads=", problem.nthreads)
+            print("Solver with multithreading = ", self.solver.with_multithreading)
+            print("Number of threads=", problem.nthreads)
             self.solver.with_callbacks = False
         elif(config['SOLVER'] == 'grg_h'):
             logger.warning("Using the GRG_H solver.")

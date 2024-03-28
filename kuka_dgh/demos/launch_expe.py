@@ -41,7 +41,7 @@ pin_robot   = load_pinocchio_wrapper('iiwa')
 if SIM:
     # Sim env + set initial state 
     config['T_tot'] = 15              
-    env = BulletEnvWithGround(p.GUI)
+    env = BulletEnvWithGround(p.DIRECT)
     robot_simulator = load_bullet_wrapper('iiwa')
     env.add_robot(robot_simulator)
     q_init = np.asarray(config['q0'] )
