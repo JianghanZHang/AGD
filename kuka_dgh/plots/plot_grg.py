@@ -35,10 +35,10 @@ s = SimpleDataPlotter()
 if(SIM):
     data_path = '/home/armand/data/grg/'
     # data_name = 'circle_grg_SIM_2024-03-28T17:06:52.388811_grg' 
-    data_name = 'circle_grg_SIM_2024-03-28T17:18:40.821517_grg' 
+    data_name = 'circle_grg_SIM_2024-03-28T17:29:43.223279_grg' 
 else:
     data_path = '/home/armand/data/grg/'
-    data_name = 'circle_grg_REAL_2024-03-28T17:21:52.802360_grg' 
+    data_name = 'circle_grg_REAL_2024-03-28T17:33:52.634305_grg' 
 
 r       = DataReader(data_path+data_name+'.mds')
 N       = r.data['absolute_time'].shape[0]

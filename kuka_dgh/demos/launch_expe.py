@@ -104,6 +104,6 @@ if SIM:
     thread_head.stop_logging()
 else:
     thread_head.start()
-    thread_head.start_logging(20, prefix+EXP_NAME+"_REAL_"+str(datetime.now().isoformat())+suffix+".mds", LOG_FIELDS=LOG_FIELDS)
+    thread_head.start_logging(45, prefix+EXP_NAME+"_REAL_"+str(datetime.now().isoformat())+suffix+".mds", LOG_FIELDS=LOG_FIELDS)
     
 thread_head.plot_timing() # <<<<<<<<<<<<< Comment out to skip timings plot
