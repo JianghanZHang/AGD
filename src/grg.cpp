@@ -102,9 +102,9 @@ bool SolverGRG::solve(const std::vector<Eigen::VectorXd>& init_xs, const std::ve
     resizeData();
   }
   fail_time_tmp_ = 0;
-  tmpxs_ = problem_->rollout_us(init_us);
-  setCandidate(tmpxs_, init_us, false);
-  // setCandidate(init_xs, init_us, false);
+  // tmpxs_ = problem_->rollout_us(init_us);
+  // setCandidate(tmpxs_, init_us, false);
+  setCandidate(init_xs, init_us, false);
 
   xs_[0] = problem_->get_x0();      // Otherwise xs[0] is overwritten by init_xs inside setCandidate()
   xs_try_[0] = problem_->get_x0();  // it is needed in case that init_xs[0] is infeasible

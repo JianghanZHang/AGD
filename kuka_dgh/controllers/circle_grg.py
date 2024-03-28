@@ -22,9 +22,12 @@ def solveOCP(q, v, solver, nb_iter, target_reach, TASK_PHASE):
     # import pdb; pdb.set_trace()
     solver.problem.x0 = x
     
-    xs_init = list(solver.xs[1:]) + [solver.xs[-1]]
+    # xs_init = list(solver.xs[1:]) + [solver.xs[-1]]
+    # xs_init[0] = x
+    # us_init = list(solver.us[1:]) + [solver.us[-1]] 
+    xs_init = list(solver.xs)
+    us_init = list(solver.us)
     xs_init[0] = x
-    us_init = list(solver.us[1:]) + [solver.us[-1]] 
     
     # Update OCP 
     if(TASK_PHASE == 1):
