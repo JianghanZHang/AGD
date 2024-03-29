@@ -34,10 +34,10 @@ config        = launch_utils.load_config_file(EXP_NAME)
 s = SimpleDataPlotter()
 
 if(SIM):
-    data_path = '/tmp/'
+    data_path = '/home/armand/data/grg/'
 
-    data_name = 'circle_grg_SIM_2024-03-18T14:31:23.780511_grg' #multi threading
-    data_name3 = 'circle_grg_SIM_2024-03-18T14:33:14.930491_grg' #single threading
+    data_name = 'circle_grg_SIM_2024-03-28T17:06:52.388811_grg'  #multi threading
+    data_name3 = 'circle_grg_SIM_2024-03-28T17:03:49.098708_grg' #single threading
 
     
 

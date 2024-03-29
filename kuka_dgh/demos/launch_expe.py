@@ -41,7 +41,7 @@ pin_robot   = load_pinocchio_wrapper('iiwa')
 if SIM:
     # Sim env + set initial state 
     config['T_tot'] = 15              
-    env = BulletEnvWithGround(p.GUI)
+    env = BulletEnvWithGround(p.DIRECT)
     robot_simulator = load_bullet_wrapper('iiwa')
     env.add_robot(robot_simulator)
     q_init = np.asarray(config['q0'] )
@@ -104,6 +104,6 @@ if SIM:
     thread_head.stop_logging()
 else:
     thread_head.start()
-    thread_head.start_logging(20, prefix+EXP_NAME+"_REAL_"+str(datetime.now().isoformat())+suffix+".mds", LOG_FIELDS=LOG_FIELDS)
+    thread_head.start_logging(45, prefix+EXP_NAME+"_REAL_"+str(datetime.now().isoformat())+suffix+".mds", LOG_FIELDS=LOG_FIELDS)
     
 thread_head.plot_timing() # <<<<<<<<<<<<< Comment out to skip timings plot
