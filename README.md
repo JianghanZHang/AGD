@@ -2,7 +2,7 @@
 
 **Authors:** Jianghan Zhang, Armand Jordana, Ludovic Righetti | **NYU**
 
-We employ Accelerated Gradient Descent (AGD) with ADAM for high-frequency Model Predictive Control (MPC), demonstrating that first-order methods can match the efficacy of second-order methods with simpler computation and faster iteration times. This repository contains the AGD implementation, performance comparisons, and practical applications on real robots.
+We employ Accelerated Gradient Descent (AGD) with ADAM for high-frequency Model Predictive Control (MPC), demonstrating that first-order methods can match the efficacy of second-order methods with simpler computation and faster iteration times. This repository contains the AGD implementation, performance comparisons, and demonstration on real robots.
 
 All the solvers are implemented based on the API of Crocoddyl (v2). In other words, AGD take as input a crocoddyl.ShootingProblem.
 
