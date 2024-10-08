@@ -10,8 +10,6 @@ All the solvers are implemented based on the API of Crocoddyl (v2). In other wor
 - AGD matches second-order method performance at 1kHz control rates for a 7-Dof manipulator.
 - Validated on a 7-DOF torque-controlled manipulator with real-world task scenarios.
 
-[View the Repository](https://github.com/JianghanZHang/AGD)
-
 **Installation:**
 conda create -n agd_env
 
